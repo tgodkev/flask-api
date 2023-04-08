@@ -2,6 +2,9 @@ from flask import Flask, jsonify, request
 import requests
 from bs4 import BeautifulSoup
 
+# need to run this in terminal for virtual environment
+# source venv/bin/activate
+
 app = Flask(__name__)
 
 def get_recipes():
@@ -21,7 +24,7 @@ def get_recipes():
             title = title_element.text.strip()
             recipes.append({'title': title, 'link': link})
     
-    return soup.prettify()
+    return recipes
 
 
 
