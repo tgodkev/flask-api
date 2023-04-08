@@ -1,56 +1,34 @@
 from flask import Flask, jsonify, request
-import uuid
+import requests
+from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
-tasks = []
+def get_recipes():
+    url = 'https://www.allrecipes.com/recipes'
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    recipe_section = soup.find('section', class_='comp three-post--home three-post mntl-block')
+    recipe_cards = recipe_section.find_all('a', class_='comp card--image-top mntl-card-list-items mntl-document-card mntl-card card card--no-image')
 
-def generate_id():
-    return str(uuid.uuid4())
+    recipes = []
+    for card in recipe_cards:
+        title_element = card.find('span', class_='card__titleText')
+        link = card['href']
 
-
-
-@app.route('/api/hello', methods=['GET'])
-def hello():
-    response = {"message": "Hello, Flask API!"}
-    return jsonify(response)
-
-@app.route('/api/tasks', methods=['POST'])
-def create_task():
-    data = request.get_json()
+        if title_element and link:
+            title = title_element.text.strip()
+            recipes.append({'title': title, 'link': link})
     
-    if not data or 'title' not in data:
-        return jsonify({"message": "Title is required"}), 400
-    
-    new_task = {
-        'id': generate_id(),
-        'title': data['title'],
-        'description': data.get('description', ''),
-        'completed': False
-    }
-    
-    tasks.append(new_task)
-    return jsonify(new_task), 201
+    return recipes
 
 
-@app.route('/api/tasks', methods=['GET'])
-def get_tasks():
-    return jsonify(tasks)
-
-
-
-@app.route('/api/tasks/<string:task_id>', methods=['GET'])
-def get_task(task_id):
-    task = next((t for t in tasks if t['id'] == task_id), None)
-    
-    if not task:
-        return jsonify({"message": "Task not found"}), 404
-        
-    return jsonify(task)
-
-
-
-
+@app.route('/api/recipes', methods=['GET'])
+def get_recipe_list():
+    recipes = get_recipes()
+    return jsonify({"message": "Recipes fetched successfully", "recipes": recipes})
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
