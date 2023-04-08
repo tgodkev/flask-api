@@ -1,21 +1,35 @@
 import tkinter as tk
+from tkinter import ttk
+import requests
 
-def on_button_click():
-    label.config(text="Hello Tkinter!")
+def send_request():
+    url = url_entry.get()
+    method = request_method.get()
 
-root = tk.Tk()
-root.title("Simple Tkinter GUI")
+    if method == "GET":
+        response = requests.get(url)
+    elif method == "POST":
+        response = requests.post(url)
 
-frame = tk.Frame(root, padx=10, pady=10)
-frame.pack()
+    response_text.delete(1.0, tk.END)
+    response_text.insert(tk.END, response.text)
 
-label = tk.Label(frame, text="Welcome to Tkinter!")
-label.grid(row=0, column=0, columnspan=2)
+app = tk.Tk()
+app.title("HTTP Request Tester")
 
-button = tk.Button(frame, text="Click me!", command=on_button_click)
-button.grid(row=1, column=0)
+url_label = ttk.Label(app, text="URL:")
+url_label.grid(column=0, row=0)
+url_entry = ttk.Entry(app, width=50)
+url_entry.grid(column=1, row=0)
 
-quit_button = tk.Button(frame, text="Quit", command=root.quit)
-quit_button.grid(row=1, column=1)
+request_method = ttk.Combobox(app, values=["GET", "POST"], state="readonly")
+request_method.set("GET")
+request_method.grid(column=2, row=0)
 
-root.mainloop()
+send_button = ttk.Button(app, text="Send", command=send_request)
+send_button.grid(column=3, row=0)
+
+response_text = tk.Text(app, wrap=tk.WORD, width=80, height=25)
+response_text.grid(column=0, row=1, columnspan=4)
+
+app.mainloop()
