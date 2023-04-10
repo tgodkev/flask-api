@@ -32,4 +32,5 @@ send_button.grid(column=3, row=0)
 response_text = tk.Text(app, wrap=tk.WORD, width=80, height=25)
 response_text.grid(column=0, row=1, columnspan=4)
 
-app.mainloop()
+def run_gui():
+    app.mainloop()

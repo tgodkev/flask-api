@@ -15,6 +15,8 @@ def get_recipes():
     recipe_cards = soup.select('span.card__title')
     recipes = [card.text.strip() for card in recipe_cards]
     
+        
+    
     return recipes
 
 
@@ -25,7 +27,7 @@ def get_recipe_list():
     recipes = get_recipes()
     return jsonify({"message": "Recipes fetched successfully", "recipes": recipes})
 
-if __name__ == '__main__':
-    app.run(debug=True)
+def run_api():
+    app.run(host='127.0.0.1', port=5000)
 
 
